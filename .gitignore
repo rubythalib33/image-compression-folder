@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+.vscode 
+datasets
+01_image_compression_srgan/test.py
+trashbin
