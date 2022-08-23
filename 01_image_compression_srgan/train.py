@@ -62,7 +62,7 @@ def main():
         pin_memory=True,
         num_workers=config.NUM_WORKERS,
     )
-    gen = Generator(in_channels=3).to(config.DEVICE)
+    gen = Generator(in_channels=3).to(config.DEVICE, ratio=config.RATIO)
     disc = Discriminator(in_channels=3).to(config.DEVICE)
     opt_gen = optim.Adam(gen.parameters(), lr=config.LEARNING_RATE, betas=(0.9, 0.999))
     opt_disc = optim.Adam(disc.parameters(), lr=config.LEARNING_RATE, betas=(0.9, 0.999))
