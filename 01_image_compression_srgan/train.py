@@ -49,12 +49,12 @@ def train_fn(loader, disc, gen, opt_gen, opt_disc, mse, bce, vgg_loss):
         opt_gen.step()
 
         if idx % 200 == 0:
-            plot_examples("Datasets/DIV2K_valid_LR_bicubic/X4/", gen)
+            plot_examples(config.VAL_PATH, gen)
             print(f'discrimantor loss:{loss_disc}')
             print(f'Generative loss:{gen_loss}')
 
 def main():
-    dataset = MyImageFolder(root_dir="Datasets/train_DIV2K/")
+    dataset = MyImageFolder(root_dir=config.TRAIN_PATH)
     loader = DataLoader(
         dataset,
         batch_size=config.BATCH_SIZE,
@@ -62,7 +62,7 @@ def main():
         pin_memory=True,
         num_workers=config.NUM_WORKERS,
     )
-    gen = Generator(in_channels=3).to(config.DEVICE, ratio=config.RATIO)
+    gen = Generator(in_channels=3, ratio=config.RATIO).to(config.DEVICE)
     disc = Discriminator(in_channels=3).to(config.DEVICE)
     opt_gen = optim.Adam(gen.parameters(), lr=config.LEARNING_RATE, betas=(0.9, 0.999))
     opt_disc = optim.Adam(disc.parameters(), lr=config.LEARNING_RATE, betas=(0.9, 0.999))

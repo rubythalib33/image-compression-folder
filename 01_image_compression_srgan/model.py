@@ -1,4 +1,4 @@
-from math import sqrt
+from math import log2
 import torch
 from torch import nn
 
@@ -69,7 +69,7 @@ class Generator(nn.Module):
         self.initial = ConvBlock(in_channels, num_channels, kernel_size=9, stride=1, padding=4, use_bn=False)
         self.residuals = nn.Sequential(*[ResidualBlock(num_channels) for _ in range(num_blocks)])
         self.convblock = ConvBlock(num_channels, num_channels, kernel_size=3, stride=1, padding=1, use_act=False)
-        self.upsamples = nn.Sequential(*[UpsampleBlock(num_channels, 2) for _ in range(int(sqrt(ratio)))])
+        self.upsamples = nn.Sequential(*[UpsampleBlock(num_channels, 2) for _ in range(int(log2(ratio)))])
         self.final = nn.Conv2d(num_channels, in_channels, kernel_size=9, stride=1, padding=4)
 
     def forward(self, x):
@@ -113,10 +113,10 @@ class Discriminator(nn.Module):
         return self.classifier(x)
 
 def test():
-    low_resolution = 24  # 96x96 -> 24x24
+    low_resolution = 256//8  # 96x96 -> 24x24
     with torch.cuda.amp.autocast():
         x = torch.randn((5, 3, low_resolution, low_resolution))
-        gen = Generator()
+        gen = Generator(ratio=8)
         gen_out = gen(x)
         disc = Discriminator()
         disc_out = disc(gen_out)
