@@ -34,3 +34,13 @@ def compress(img, ratio=4):
     binary = compress_binary(shrink)
 
     return binary
+
+if __name__ == '__main__':
+    import cv2
+
+    path = "asset/HR_images/0810x4.png"
+    img = cv2.imread(path)
+
+    compressed = compress(img)
+
+    cv2.imwrite("asset/Compressed/result2.png", compressed)
