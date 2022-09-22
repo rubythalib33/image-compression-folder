@@ -1,6 +1,7 @@
 from math import log2
 import torch
 from torch import nn
+from torchvision.models.efficientnet import MBConv, FusedMBConv, MBConvConfig, FusedMBConvConfig
 
 
 class ConvBlock(nn.Module):
@@ -37,40 +38,14 @@ class UpsampleBlock(nn.Module):
     def forward(self, x):
         return self.act(self.ps(self.conv(x)))
 
-
-class ResidualBlock(nn.Module):
-    def __init__(self, in_channels):
-        super().__init__()
-        self.block1 = ConvBlock(
-            in_channels,
-            in_channels,
-            kernel_size=3,
-            stride=1,
-            padding=1
-        )
-        self.block2 = ConvBlock(
-            in_channels,
-            in_channels,
-            kernel_size=3,
-            stride=1,
-            padding=1,
-            use_act=False,
-        )
-
-    def forward(self, x):
-        out = self.block1(x)
-        out = self.block2(out)
-        return out + x
-
-
 class Generator(nn.Module):
-    def __init__(self, in_channels=3, num_channels=64, num_blocks=16, ratio=4):
+    def __init__(self, in_channels=3, num_channels=[32,16,64,40,80,112,192,320], num_blocks=[1,2,2,3,3,4,1], ratio=4):
         super().__init__()
-        self.initial = ConvBlock(in_channels, num_channels, kernel_size=9, stride=1, padding=4, use_bn=False)
-        self.residuals = nn.Sequential(*[ResidualBlock(num_channels) for _ in range(num_blocks)])
-        self.convblock = ConvBlock(num_channels, num_channels, kernel_size=3, stride=1, padding=1, use_act=False)
-        self.upsamples = nn.Sequential(*[UpsampleBlock(num_channels, 2) for _ in range(int(log2(ratio)))])
-        self.final = nn.Conv2d(num_channels, in_channels, kernel_size=9, stride=1, padding=4)
+        self.initial = ConvBlock(in_channels, num_channels[0], kernel_size=9, stride=1, padding=4, use_bn=False)
+        self.residuals = nn.Sequential(*[MBConv(MBConvConfig(1.0, 3, 1, num_channels[i], num_channels[i+1], num_blocks[i]), 0.2, None) for i in range(len(num_blocks))])
+        self.convblock = ConvBlock(num_channels[-1], num_channels[0], kernel_size=3, stride=1, padding=1, use_act=False)
+        self.upsamples = nn.Sequential(*[UpsampleBlock(num_channels[0], 2) for _ in range(int(log2(ratio)))])
+        self.final = nn.Conv2d(num_channels[0], in_channels, kernel_size=9, stride=1, padding=4)
 
     def forward(self, x):
         initial = self.initial(x)
@@ -126,8 +101,8 @@ def test():
             disc = Discriminator()
             disc_out = disc(gen_out)
 
-            print(gen_out.shape)
-            print(disc_out.shape)
+        print(gen_out.shape)
+        print(disc_out.shape)
 
 
 if __name__ == "__main__":
