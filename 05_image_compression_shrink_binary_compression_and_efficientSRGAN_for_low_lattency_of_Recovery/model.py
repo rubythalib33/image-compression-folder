@@ -89,6 +89,9 @@ class Discriminator(nn.Module):
 
 def test():
     import time
+    import numpy as np
+    from fvcore.nn.flop_count import flop_count
+
     low_resolution = 256//4  # 96x96 -> 24x24
     with torch.inference_mode():
         with torch.cuda.amp.autocast():
@@ -104,6 +107,11 @@ def test():
         print(gen_out.shape)
         print(disc_out.shape)
 
+        model_parameters = filter(lambda p: p.requires_grad, gen.parameters())
+        params = sum([np.prod(p.size()) for p in model_parameters])
+        print(params)
+
+        print(sum(flop_count(gen, x)[0].values()))
 
 if __name__ == "__main__":
     test()
