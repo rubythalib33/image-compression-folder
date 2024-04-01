@@ -2,7 +2,7 @@ from math import log2
 import torch
 from torch import nn
 
-
+# mendefiniskan modul bernama ConvBlock -> Conv2d -> Batchnorm -> LeakyReLU atau PReLU
 class ConvBlock(nn.Module):
     def __init__(
         self,
@@ -26,7 +26,7 @@ class ConvBlock(nn.Module):
     def forward(self, x):
         return self.act(self.bn(self.cnn(x))) if self.use_act else self.bn(self.cnn(x))
 
-
+#sebuah modul yang berisi: convolution -> PixelShuffle -> 
 class UpsampleBlock(nn.Module):
     def __init__(self, in_c, scale_factor):
         super().__init__()
@@ -37,7 +37,7 @@ class UpsampleBlock(nn.Module):
     def forward(self, x):
         return self.act(self.ps(self.conv(x)))
 
-
+#sebuah modul yang digunakan untuk melakukan residual block
 class ResidualBlock(nn.Module):
     def __init__(self, in_channels):
         super().__init__()
@@ -62,10 +62,16 @@ class ResidualBlock(nn.Module):
         out = self.block2(out)
         return out + x
 
-
+# modul generator network
+    # input parameter:
+    # - in_channels: input channels
+    # - num_channels: number of channel di residual block
+    # - num_blocks: number of block dari residual block
+    # - ratio: dia ratio perbesaran dari SRGAN
 class Generator(nn.Module):
     def __init__(self, in_channels=3, num_channels=64, num_blocks=16, ratio=4):
         super().__init__()
+        # initial convolutional block -> residual blocks sebanyak num_blocks -> convblock -> upsample block sebanyak log2(ratio) -> Prediction Layer Conv2d
         self.initial = ConvBlock(in_channels, num_channels, kernel_size=9, stride=1, padding=4, use_bn=False)
         self.residuals = nn.Sequential(*[ResidualBlock(num_channels) for _ in range(num_blocks)])
         self.convblock = ConvBlock(num_channels, num_channels, kernel_size=3, stride=1, padding=1, use_act=False)
@@ -79,7 +85,7 @@ class Generator(nn.Module):
         x = self.upsamples(x)
         return torch.tanh(self.final(x))
 
-
+#discriminator seperti arsitektur image classification pada umumnya
 class Discriminator(nn.Module):
     def __init__(self, in_channels=3, features=[64, 64, 128, 128, 256, 256, 512, 512]):
         super().__init__()
