@@ -12,8 +12,6 @@ def psnr(img1, img2):
     psnr = 20 * log10(max_pixel / sqrt(mse))
     return psnr
 
-
-
 def bit8to4(img):
     return (img//16).astype(np.uint8)
 

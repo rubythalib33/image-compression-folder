@@ -21,7 +21,7 @@ class MyImageFolder(Dataset):
         image = np.array(Image.open(img_file))
         image = config.both_transforms(image=image)["image"]
         high_res = config.highres_transform(image=image)["image"]
-        image = bit4to8(bit8to4(image))
+        image = bit4to8(bit8to4(image)) #sengaja kita berikan value loss di low_res image
         low_res = config.lowres_transform(image=image)["image"]
         return low_res, high_res
 
