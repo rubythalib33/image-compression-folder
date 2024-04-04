@@ -53,6 +53,7 @@ def load_checkpoint(checkpoint_file, model, optimizer, lr):
 
 def plot_examples(low_res_folder, gen):
     os.system("rm saved/*")
+    os.makedirs('saved', exist_ok=True)
     files = os.listdir(low_res_folder)
     np.random.shuffle(files)
     gen.eval()
@@ -66,7 +67,7 @@ def plot_examples(low_res_folder, gen):
                     .to(config.DEVICE)
                 )
             save_image(upscaled_img * 0.5 + 0.5, f"saved/{file}")
-        except : print('Memory insufficient for that image')
+        except Exception as e: print('Memory insufficient for that image',e)
     gen.train()
 
 def compress(img: np.ndarray, ratio:int):

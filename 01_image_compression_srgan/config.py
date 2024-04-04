@@ -5,9 +5,9 @@ from albumentations.pytorch import ToTensorV2
 
 #First Train using all loss func until Epoch 176
 
-TRAIN_PATH = "../datasets/DIV2K_train_HR/" #data train path
-VAL_PATH = "../datasets//DIV2K_valid_LR_x8/" # data validation path
-LOAD_MODEL = False
+TRAIN_PATH = "./data/" #data train path
+VAL_PATH = "./data-downscale/" # data validation path
+LOAD_MODEL = True
 SAVE_MODEL = True
 CHECKPOINT_GEN = "gen.pth.tar" #filename model generator yang kita simpan
 CHECKPOINT_DISC = "disc.pth.tar" #filename model discriminator yang kita simpan
@@ -15,7 +15,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 LEARNING_RATE = 1e-4
 START_EPOCHS = 1
 NUM_EPOCHS = 500
-BATCH_SIZE = 3
+BATCH_SIZE = 1
 NUM_WORKERS = 4
 HIGH_RES = 96
 RATIO = 4

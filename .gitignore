@@ -133,3 +133,4 @@ datasets
 trashbin
 saved
 *.pth.tar
+*data*

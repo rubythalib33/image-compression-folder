@@ -1,8 +1,8 @@
 from PIL import Image
 import os
 
-ROOT = 'Datasets/test_images'
-OUTPUT = 'Datasets/low_test_images'
+ROOT = './data'
+OUTPUT = './data-downscale/'
 
 files = os.listdir(ROOT)
 
